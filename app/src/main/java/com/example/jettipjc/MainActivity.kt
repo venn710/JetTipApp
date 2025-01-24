@@ -96,10 +96,12 @@ class MainActivity : ComponentActivity() {
                     }
 
                     fun getTotalPerPerson(): String {
-                        if (totalBillAmount.value.isEmpty()) {
+                        if (totalBillAmount.value.isEmpty() || numberOfPeople.value == 0) {
                             return "0.0"
                         }
-                        return ((totalBillAmount.value.toDouble() + ((tipPercentage.value / 100) * totalBillAmount.value.toDouble())) / numberOfPeople.value).toString()
+                        var totalPerPerson = ((totalBillAmount.value.toDouble() + ((tipPercentage.value / 100) * totalBillAmount.value.toDouble())) / numberOfPeople.value)
+                        return String.format("%.1f", totalPerPerson)
+
                     }
                     Column(
                         modifier = Modifier.padding(12.dp),
@@ -250,11 +252,12 @@ fun SplitCard(
         mutableStateOf(numberOfPeople)
     }
 
-    fun getTipAmount() : Double {
+    fun getTipAmount() : String {
         if (totalBillAmount.isEmpty()) {
-            return 0.0
+            return "0.0"
         }
-        return (tipPercentage.value / 100.0) * (totalBillAmount.toDouble())
+        var tipAmount = (tipPercentage.value / 100.0) * (totalBillAmount.toDouble())
+        return String.format("%.1f", tipAmount)
     }
 
 
@@ -269,8 +272,10 @@ fun SplitCard(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
                 IncrementAndDecrementButton(resourceID = R.drawable.baseline_horizontal_rule_24) {
-                    number.value = number.value - 1
-                    onNumberOfPeopleChange(number.value)
+                    if (number.value != 0) {
+                        number.value = number.value - 1
+                        onNumberOfPeopleChange(number.value)
+                    }
                 }
                 Spacer(modifier = Modifier.width(20.dp))
                 Text(numberOfPeople.toString())
@@ -291,7 +296,7 @@ fun SplitCard(
 
             Text(
                 modifier = Modifier.weight(weight = 3f),
-                text = getTipAmount().toString(),
+                text = getTipAmount(),
                 textAlign = TextAlign.Center
             )
         }
